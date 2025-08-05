@@ -42,6 +42,12 @@
                             <span class="ml-2">{{ __('Products') }}</span>
                         </div>
                     </a>
+                    <a href="{{ route('users.index') }}" 
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('users.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Users') }}</span>
+                        </div>
+                    </a>
                 @endif
             </nav>
 

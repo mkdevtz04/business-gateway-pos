@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .sidebar-link {
+        @apply block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200;
+    }
+
+    .sidebar-link.active {
+        @apply bg-gray-700 text-white;
+    }
+}
