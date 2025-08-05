@@ -10,68 +10,75 @@
 </head>
 
 <body class="bg-gray-100 font-sans">
-    <header class="bg-gray-200 border-b border-gray-300">
-        <div class="max-w-7xl mx-auto px-4 py-2">
-            <div class="flex justify-between items-center">
-                <!-- Logo Section and Navigation Container -->
-                <div class="flex items-center space-x-2">
-                    <!-- Logo Section -->
-                    <div class="flex items-center">
-                        <img src="{{ asset('storage/logos/mkdev.png') }}" alt="Logo" class="h-10 w-10">
-                    </div>
-
-                    <!-- Navigation Links -->
-                    <nav class="hidden md:flex space-x-1">
-                        <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
-                            {{ __('Dashboard') }}
-                        </a>
-
-                        @if(auth()->user()->role === 'admin')
-                        {{-- <a href="{{ route('categories.index') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
-                            {{ __('Categories') }}
-                        </a> --}}
-                        <a href="{{ route('products.index') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
-                            {{ __('Products') }}
-                        </a>
-                        @endif
-                    </nav>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="bg-gray-800 text-white w-64 min-h-screen">
+            <!-- Logo Section -->
+            <div class="p-4 border-b border-gray-700">
+                <div class="flex items-center justify-center">
+                    <img src="{{ asset('storage/logos/mkdev.png') }}" alt="Logo" class="h-12 w-12">
                 </div>
+            </div>
 
-                <!-- User Menu -->
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-800">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
+            <!-- Navigation Links -->
+            <nav class="mt-4">
+                <a href="{{ route('dashboard') }}"
+                   class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
+                    <div class="flex items-center">
+                        <span class="ml-2">{{ __('Dashboard') }}</span>
+                    </div>
+                </a>
+
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('categories.index') }}"
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('categories.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Categories') }}</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('products.index') }}"
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('products.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Products') }}</span>
+                        </div>
+                    </a>
+                @endif
+            </nav>
+
+            <!-- User Menu -->
+            <div class="absolute bottom-0 w-64 border-t border-gray-700">
+                <div class="p-4">
+                    <div class="text-sm text-gray-300 mb-2">{{ auth()->user()->name }}</div>
+                    <div class="text-xs text-gray-500 mb-4">{{ auth()->user()->role }}</div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
+                        <button type="submit"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
                             {{ __('Log Out') }}
                         </button>
                     </form>
                 </div>
             </div>
+        </aside>
 
-            <!-- Mobile Navigation Menu -->
-            <div class="md:hidden mt-2">
-                <div class="space-y-0.5">
-                    <a href="{{ route('dashboard') }}" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
-                        {{ __('Dashboard') }}
-                    </a>
-
-                    @if(auth()->user()->role === 'admin')
-                    {{-- <a href="{{ route('categories.index') }}" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md">
-                        {{ __('Categories') }}
-                    </a> --}}
-                    <a href="{{ route('products.index') }}" class="block text-white-600 hover:text-gray-900 px-3 py-2 rounded-md">cat
-                        {{ __('Products') }}
-                    </a>
-                    @endif
-                </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Mobile Navigation Toggle -->
+            <div class="md:hidden p-4">
+                <button class="text-gray-600 hover:text-gray-900">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
             </div>
+
+            <!-- Page Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+                <div class="container mx-auto px-6 py-8">
+                    @yield('content')
+                </div>
+            </main>
         </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto py-6 px-4">
-        @yield('content')
-    </main>
+    </div>
 </body>
-
 </html>
