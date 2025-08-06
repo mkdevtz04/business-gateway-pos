@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Notifications\LowStockNotification;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name', 
         'category_id', 

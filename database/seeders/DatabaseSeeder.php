@@ -13,16 +13,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // User::create([
-        //     'name' => 'Admin User',
-        //     'email' => 'admin@pos.com',
-        //     'password' => bcrypt('password123'),
-        //     'role' => 'admin',
-        // ]);
+        User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@pos.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
+        ]);
 
-        // Category::create(['name' => 'Beverages']);
-        // Category::create(['name' => 'Snacks']);
-        // Category::create(['name' => 'Dairy']);
+        Category::create(['name' => 'Beverages']);
+        Category::create(['name' => 'Snacks']);
+        Category::create(['name' => 'Dairy']);
 
 
 
