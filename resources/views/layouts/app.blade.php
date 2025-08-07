@@ -4,9 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>{{ config('app.name', 'Business Gateway POS') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -48,7 +50,27 @@
                             <span class="ml-2">{{ __('Users') }}</span>
                         </div>
                     </a>
+                @elseif(auth()->user()->role === 'clerk')
+                    <a href="{{ route('pos.index') }}"
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('pos.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Point of Sale') }}</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('orders.index') }}"
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('orders.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Orders') }}</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('sales.index') }}"
+                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('sales.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Sales History') }}</span>
+                        </div>
+                    </a>
                 @endif
+                
             </nav>
 
             <!-- User Menu -->
@@ -86,5 +108,8 @@
             </main>
         </div>
     </div>
+
+    <!-- Add this before closing body tag -->
+    @stack('scripts')
 </body>
 </html>

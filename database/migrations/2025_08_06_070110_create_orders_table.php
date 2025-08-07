@@ -14,12 +14,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('quantity');
-            $table->decimal('discount', 5, 2)->default(0);
-            $table->decimal('tax', 8, 2)->default(0);
-            $table->decimal('amount_due', 8, 2);
+            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_tax', 8, 2)->default(0);
+            $table->decimal('total_discount', 5, 2)->default(0);
             $table->enum('payment_method', ['cash', 'credit'])->nullable();
+            $table->string('status')->default('pending');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
