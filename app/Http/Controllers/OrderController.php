@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -99,5 +100,18 @@ class OrderController extends Controller
         $product->decrement('quantity_available', $quantity);
 
         return redirect()->route('orders.index')->with('success', 'Order created successfully!');
+    }
+
+    public function downloadPDF(Order $order)
+    {
+        // Load relationships for invoice
+        $order->load(['items.product', 'customer', 'user']);
+
+        // Render invoice view as PDF
+        $pdf = Pdf::loadView('orders.invoice-pdf', compact('order'))
+                  ->setPaper('A4', 'portrait');
+
+        // Return as download
+        return $pdf->download('invoice-'.$order->id.'.pdf');
     }
 }
