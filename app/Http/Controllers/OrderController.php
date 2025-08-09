@@ -36,8 +36,9 @@ class OrderController extends Controller
 
 
 
-     public function show(Order $order)
+    public function show(Order $order)
     {
+        // die('This is the show method');
         // Thanks to Laravel's route model binding, the correct Order instance
         // is automatically injected.
 
@@ -47,7 +48,7 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    
+
     public function create()
     {
         return view('orders.create');

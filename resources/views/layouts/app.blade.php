@@ -60,15 +60,15 @@
                     <a href="{{ route('orders.index') }}"
                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('orders.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
-                            <span class="ml-2">{{ __('Orders') }}</span>
+                            <span class="ml-2">{{ __('Sales') }}</span>
                         </div>
                     </a>
-                    <a href="{{ route('sales.index') }}"
+                    {{-- <a href="{{ route('sales.index') }}"
                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('sales.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Sales History') }}</span>
                         </div>
-                    </a>
+                    </a> --}}
                 @endif
                 
             </nav>

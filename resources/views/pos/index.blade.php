@@ -31,6 +31,26 @@
     <!-- Cart -->
     <div class="w-1/3 bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-bold mb-4">Cart</h2>
+
+        <!-- Customer Selection -->
+        <div class="mb-4">
+            <label for="customer-select" class="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+            <select id="customer-select" class="w-full p-2 border rounded">
+                <option value="">Walk-in Customer</option>
+                <option value="new" class="font-bold text-blue-600">+ Add New Customer</option>
+                @foreach($customers as $customer)
+                    <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- New Customer Form (Initially Hidden) -->
+        <div id="new-customer-form" class="hidden mb-4 p-4 bg-gray-50 rounded border">
+            <h3 class="font-semibold mb-2">New Customer Details</h3>
+            <input type="text" id="customer-name" placeholder="Customer Name" class="w-full p-2 border rounded mb-2">
+            <input type="text" id="customer-contact" placeholder="Contact (Phone/Email)" class="w-full p-2 border rounded">
+        </div>
+
         <div id="cart-items" class="mb-4 space-y-2"></div>
         
         <div class="border-t pt-4">
@@ -74,8 +94,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add click event listener to checkout button
+    // Checkout button
     document.getElementById('checkout-btn').addEventListener('click', checkout);
+
+    // Toggle new customer form
+    document.getElementById('customer-select').addEventListener('change', function() {
+        const newCustomerForm = document.getElementById('new-customer-form');
+        if (this.value === 'new') {
+            newCustomerForm.classList.remove('hidden');
+        } else {
+            newCustomerForm.classList.add('hidden');
+        }
+    });
 });
 
 function addToCart(product) {
@@ -139,7 +169,6 @@ function updateCartDisplay() {
         `;
     });
 
-    // Add event listeners to new buttons
     document.querySelectorAll('.quantity-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = parseInt(btn.dataset.id);
@@ -182,10 +211,26 @@ function checkout() {
         return;
     }
 
-    // Disable checkout button
+    const customerId = document.getElementById('customer-select').value;
+    const customerNameInput = document.getElementById('customer-name');
+
+    if (customerId === 'new' && customerNameInput.value.trim() === '') {
+        alert('Please enter a name for the new customer.');
+        customerNameInput.focus();
+        return;
+    }
+
     const checkoutBtn = document.getElementById('checkout-btn');
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = 'Processing...';
+
+    const payload = {
+        products: cart,
+        payment_method: document.getElementById('payment-method').value,
+        customer_id: customerId,
+        customer_name: document.getElementById('customer-name').value,
+        customer_contact: document.getElementById('customer-contact').value,
+    };
 
     fetch('{{ route("pos.checkout") }}', {
         method: 'POST',
@@ -194,12 +239,17 @@ function checkout() {
             'Accept': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        body: JSON.stringify({
-            products: cart,
-            payment_method: document.getElementById('payment-method').value
-        })
+        body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                const message = errorData.message || 'An error occurred.';
+                throw new Error(message);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             window.location.href = data.redirect_url;
@@ -209,10 +259,9 @@ function checkout() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(error.message || 'An error occurred during checkout');
+        alert(error.message);
     })
     .finally(() => {
-        // Re-enable checkout button
         checkoutBtn.disabled = false;
         checkoutBtn.textContent = 'Checkout';
     });
