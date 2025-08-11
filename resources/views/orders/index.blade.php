@@ -34,10 +34,19 @@
                                 </td>
                                 <td class="py-3 px-4">{{ $order->created_at->format('M d, Y') }}</td>
                                 <td class="py-3 px-4 text-center">
-                                    <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-800">
-                                        View Details
-                                    </a>
+                                    @if (auth()->user()->role === 'admin')
+                                        <a href="{{ route('admin.orders.show', $order) }}"
+                                            class="text-blue-600 hover:text-blue-800">
+                                            View Details
+                                        </a>
+                                    @else
+                                        <a href="{{ route('orders.show', $order) }}"
+                                            class="text-blue-600 hover:text-blue-800">
+                                            View Details
+                                        </a>
+                                    @endif
                                 </td>
+
                             </tr>
                         @empty
                             <tr>

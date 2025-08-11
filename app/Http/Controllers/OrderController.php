@@ -26,28 +26,39 @@ class OrderController extends Controller
 
     public function index()
     {
-        // Fetch all orders, newest first, and paginate them.
-        // Eager load the 'user' relationship to prevent N+1 query problems.
-        $orders = Order::with('user')
-            ->latest()
-            ->paginate(15); // Show 15 orders per page
+        // dd('This is the index method');
+        // Start query with eager loading
+        $query = Order::with(['user', 'customer'])->latest();
+
+        // Apply role-based filtering
+        if (auth()->user()->role === 'clerk') {
+            // Clerk can only see their own orders
+            $query->where('user_id', auth()->id());
+        }
+        // Owner and Admin see all orders, so no filter applied
+
+        $orders = $query->paginate(15);
 
         return view('orders.index', compact('orders'));
     }
 
 
 
-    public function show(Order $order)
-    {
-        // die('This is the show method');
-        // Thanks to Laravel's route model binding, the correct Order instance
-        // is automatically injected.
+   public function show(Order $order)
+{
+    $user = auth()->user();
+    $role = strtolower($user->role); // normalize case
 
-        // Eager load the relationships: items and the product related to each item. [1, 2]
-        $order->load(['items.product']);
-
-        return view('orders.show', compact('order'));
+    if ($role === 'clerk' && $order->user_id !== $user->id) {
+        abort(403, 'Unauthorized to view this order.');
     }
+
+    // admins & owners can view all orders
+    $order->load(['items.product', 'user', 'customer']);
+
+    return view('orders.show', compact('order'));
+}
+
 
 
     public function create()
@@ -109,9 +120,9 @@ class OrderController extends Controller
 
         // Render invoice view as PDF
         $pdf = Pdf::loadView('orders.invoice-pdf', compact('order'))
-                  ->setPaper('A4', 'portrait');
+            ->setPaper('A4', 'portrait');
 
         // Return as download
-        return $pdf->download('invoice-'.$order->id.'.pdf');
+        return $pdf->download('invoice-' . $order->id . '.pdf');
     }
 }

@@ -14,7 +14,7 @@
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside class="bg-gray-800 text-white w-64 min-h-screen">
+        <aside class="bg-gray-800 text-white w-64 min-h-screen print:hidden">
             <!-- Logo Section -->
             <div class="p-4 border-b border-gray-700">
                 <div class="flex items-center justify-center">
@@ -25,40 +25,48 @@
             <!-- Navigation Links -->
             <nav class="mt-4">
                 <a href="{{ route('dashboard') }}"
-                   class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
                     <div class="flex items-center">
                         <span class="ml-2">{{ __('Dashboard') }}</span>
                     </div>
                 </a>
 
-                @if(auth()->user()->role === 'admin')
+                @if (auth()->user()->role === 'admin')
                     <a href="{{ route('categories.index') }}"
-                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('categories.*') ? 'bg-gray-700' : '' }}">
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('categories.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Categories') }}</span>
                         </div>
                     </a>
                     <a href="{{ route('products.index') }}"
-                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('products.*') ? 'bg-gray-700' : '' }}">
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('products.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Products') }}</span>
                         </div>
                     </a>
-                    <a href="{{ route('users.index') }}" 
-                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('users.*') ? 'bg-gray-700' : '' }}">
+
+                    <a href="/admin/orders"
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('orders.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <span class="ml-2">{{ __('Sales') }}</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('users.index') }}"
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('users.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Users') }}</span>
                         </div>
                     </a>
                 @elseif(auth()->user()->role === 'clerk')
                     <a href="{{ route('pos.index') }}"
-                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('pos.*') ? 'bg-gray-700' : '' }}">
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('pos.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Point of Sale') }}</span>
                         </div>
                     </a>
                     <a href="{{ route('orders.index') }}"
-                       class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('orders.*') ? 'bg-gray-700' : '' }}">
+                        class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('orders.*') ? 'bg-gray-700' : '' }}">
                         <div class="flex items-center">
                             <span class="ml-2">{{ __('Sales') }}</span>
                         </div>
@@ -70,7 +78,7 @@
                         </div>
                     </a> --}}
                 @endif
-                
+
             </nav>
 
             <!-- User Menu -->
@@ -81,7 +89,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                                class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
+                            class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md">
                             {{ __('Log Out') }}
                         </button>
                     </form>
@@ -95,7 +103,8 @@
             <div class="md:hidden p-4">
                 <button class="text-gray-600 hover:text-gray-900">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
             </div>
@@ -112,4 +121,5 @@
     <!-- Add this before closing body tag -->
     @stack('scripts')
 </body>
+
 </html>

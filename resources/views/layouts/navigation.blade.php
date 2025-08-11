@@ -13,7 +13,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    @if(Auth::user()->role === 'admin')
+                    {{-- @if(Auth::user()->role === 'admin')
                         <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                             {{ __('Categories') }}
                         </x-nav-link>
@@ -21,7 +21,7 @@
                         <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                             {{ __('Products') }}
                         </x-nav-link>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
 

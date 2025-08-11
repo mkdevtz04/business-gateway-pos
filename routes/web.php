@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
@@ -26,9 +27,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 
 
@@ -38,6 +37,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
         Route::resource('users', UserController::class);
+        Route::get('/admin/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+
+
     });
 
     // Clerk Routes
@@ -49,10 +52,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'store', 'create']);
         Route::get('/sales/history', [SalesController::class, 'history'])->name('sales.history');
         Route::get('sales', [SalesController::class, 'index'])->name('sales.index');
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
 
 
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{order}/pdf', [OrderController::class, 'downloadPDF'])->name('orders.pdf');
     });
 });
 
