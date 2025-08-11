@@ -12,7 +12,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:admin,owner','clerk'])->except(['index', 'search']);
+        $this->middleware(['auth', 'role:admin,owner'])->except(['index', 'search']);
     }
 
     public function index()
@@ -40,6 +40,7 @@ class ProductController extends Controller
         ]);
 
         $data = $request->all();
+        
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
             $data['image_path'] = $path;
@@ -70,7 +71,9 @@ class ProductController extends Controller
         ]);
 
         $data = $request->all();
+
         if ($request->hasFile('image')) {
+            // Delete old image if exists
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
@@ -86,9 +89,6 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
-        }
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted.');
     }
@@ -96,16 +96,7 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('q');
-
-        if (!$query) {
-            return response()->json([]);
-        }
-
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->select('id', 'name', 'price', 'tax_rate')
-            ->take(10)
-            ->get();
-
+        $products = Product::where('name', 'like', "%{$query}%")->get(['id', 'name', 'price']);
         return response()->json($products);
     }
 }
