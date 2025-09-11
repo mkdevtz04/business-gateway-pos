@@ -5,10 +5,25 @@
     <!-- Products List -->
     <div class="w-2/3 p-6 bg-white rounded-lg shadow mr-4">
         <h2 class="text-xl font-bold mb-4">Products</h2>
-        <div class="grid grid-cols-3 gap-4">
+
+        <!-- Search Bar -->
+        <div class="mb-4">
+            <input
+                type="text"
+                id="product-search"
+                class="w-full p-2 border rounded"
+                placeholder="Search products by name, size, or category..."
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="grid grid-cols-3 gap-4" id="products-grid">
             @foreach($products as $product)
             <div class="border p-4 rounded-lg cursor-pointer hover:shadow-lg transition-shadow product-card"
-                 data-product="{{ json_encode($product) }}">
+                 data-product="{{ json_encode($product) }}"
+                 data-name="{{ strtolower($product->name) }}"
+                 data-size="{{ strtolower($product->size ?? '') }}"
+                 data-category="{{ strtolower(optional($product->category)->name ?? '') }}">
                 @if($product->image_path)
                     <img src="{{ asset('storage/' . $product->image_path) }}" 
                          alt="{{ $product->name }}"
@@ -105,6 +120,25 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             newCustomerForm.classList.add('hidden');
         }
+    });
+
+    // Product search functionality
+    document.getElementById('product-search').addEventListener('input', function() {
+        const query = this.value.trim().toLowerCase();
+        document.querySelectorAll('.product-card').forEach(card => {
+            const name = card.dataset.name;
+            const size = card.dataset.size;
+            const category = card.dataset.category;
+            if (
+                name.includes(query) ||
+                size.includes(query) ||
+                category.includes(query)
+            ) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     });
 });
 

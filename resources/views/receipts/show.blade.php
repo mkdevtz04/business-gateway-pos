@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <img src="{{ public_path('storage/logos/business_logo.png') }}" class="logo">
+    <img src="{{ public_path('storage/logos/mkdev.png') }}" class="logo">
     <h1>Business Gateway POS</h1>
     <div class="details">
         <p><strong>Order ID:</strong> {{ $order->id }}</p>

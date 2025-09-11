@@ -21,7 +21,7 @@
             </div>
 
             <nav class="mt-4">
-                <a href="#"
+                <a href="/dashboard"
                     class="block px-4 py-3 text-[#B0D6B0]  hover:text-black {{ request()->routeIs('dashboard') ? ' ' : '' }}">
                     <div class="flex items-center">
                         <span class="ml-2">{{ __('Dashboard') }}</span>
