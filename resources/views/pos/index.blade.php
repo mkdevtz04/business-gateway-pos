@@ -8,22 +8,43 @@
 
         <!-- Search Bar -->
         <div class="mb-4">
-            <input
-                type="text"
-                id="product-search"
-                class="w-full p-2 border rounded"
-                placeholder="Search products by name, size, or category..."
-                autocomplete="off"
-            >
+            <div class="relative">
+                <input
+                    type="text"
+                    id="product-search"
+                    class="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Search products by name, size, or category..."
+                    autocomplete="off"
+                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
+        <!-- No Results Message -->
+        <div id="no-results" class="hidden text-center py-8 text-gray-500">
+            No products found matching your search.
+        </div>
+
+        <!-- Products Grid -->
         <div class="grid grid-cols-3 gap-4" id="products-grid">
             @foreach($products as $product)
-            <div class="border p-4 rounded-lg cursor-pointer hover:shadow-lg transition-shadow product-card"
+            <div class="border p-4 rounded-lg transition-shadow product-card relative"
                  data-product="{{ json_encode($product) }}"
                  data-name="{{ strtolower($product->name) }}"
                  data-size="{{ strtolower($product->size ?? '') }}"
                  data-category="{{ strtolower(optional($product->category)->name ?? '') }}">
+                @if($product->quantity_available <= 0)
+                    <div class="absolute inset-0 bg-gray-900 bg-opacity-50 rounded-lg flex items-center justify-center">
+                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            Out of Stock
+                        </span>
+                    </div>
+                @endif
+                
                 @if($product->image_path)
                     <img src="{{ asset('storage/' . $product->image_path) }}" 
                          alt="{{ $product->name }}"
@@ -33,10 +54,16 @@
                         <span class="text-gray-500">No image</span>
                     </div>
                 @endif
+                
                 <h3 class="font-semibold">{{ $product->name }}</h3>
                 <p class="text-gray-600">Price: ${{ number_format($product->price, 2) }}</p>
                 <p class="text-sm {{ $product->quantity_available < 10 ? 'text-red-600' : 'text-gray-500' }}">
-                    Stock: {{ $product->quantity_available }}
+                    @if($product->quantity_available > 0)
+                        Stock: {{ $product->quantity_available }}
+                        @if($product->quantity_available < 10)
+                            (Low Stock)
+                        @endif
+                    @endif
                 </p>
             </div>
             @endforeach
@@ -123,23 +150,57 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Product search functionality
-    document.getElementById('product-search').addEventListener('input', function() {
-        const query = this.value.trim().toLowerCase();
-        document.querySelectorAll('.product-card').forEach(card => {
-            const name = card.dataset.name;
-            const size = card.dataset.size;
-            const category = card.dataset.category;
-            if (
-                name.includes(query) ||
-                size.includes(query) ||
-                category.includes(query)
-            ) {
-                card.style.display = '';
+   document.getElementById('product-search').addEventListener('input', function() {
+    const query = this.value.trim().toLowerCase();
+    let visibleProducts = 0;
+
+    document.querySelectorAll('.product-card').forEach(card => {
+        const name = card.dataset.name;
+        const size = card.dataset.size;
+        const category = card.dataset.category;
+        const isAvailable = parseInt(JSON.parse(card.dataset.product).quantity_available) > 0;
+
+        // Check if the card matches the search query
+        const matchesQuery = name.includes(query) || size.includes(query) || category.includes(query);
+
+        if (matchesQuery) {
+            card.style.display = '';
+            visibleProducts++;
+
+            // If product is not available and no "Out of Stock" overlay exists, add a message
+            if (!isAvailable) {
+                let availabilityMessage = card.querySelector('.availability-message');
+                if (!availabilityMessage && !card.querySelector('.bg-gray-900.bg-opacity-50')) {
+                    availabilityMessage = document.createElement('div');
+                    availabilityMessage.className = 'availability-message';
+                    availabilityMessage.style.color = 'red';
+                    availabilityMessage.style.fontSize = '0.875rem';
+                    availabilityMessage.style.fontWeight = '600';
+                    availabilityMessage.style.textAlign = 'center';
+                    availabilityMessage.textContent = 'Not Available';
+                    card.appendChild(availabilityMessage);
+                }
             } else {
-                card.style.display = 'none';
+                // Remove the "Not Available" message if the product is available
+                const availabilityMessage = card.querySelector('.availability-message');
+                if (availabilityMessage) {
+                    availabilityMessage.remove();
+                }
             }
-        });
+        } else {
+            card.style.display = 'none';
+            // Remove any existing "Not Available" message when hidden
+            const availabilityMessage = card.querySelector('.availability-message');
+            if (availabilityMessage) {
+                availabilityMessage.remove();
+            }
+        }
     });
+
+    // Show or hide "No Results" message
+    const noResultsEl = document.getElementById('no-results');
+    noResultsEl.classList.toggle('hidden', visibleProducts > 0);
+});
 });
 
 function addToCart(product) {
