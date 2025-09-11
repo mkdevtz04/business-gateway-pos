@@ -37,7 +37,7 @@ class OrderController extends Controller
         }
         // Owner and Admin see all orders, so no filter applied
 
-        $orders = $query->paginate(15);
+        $orders = $query->paginate(10);
 
         return view('orders.index', compact('orders'));
     }
