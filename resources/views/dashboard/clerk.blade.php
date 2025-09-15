@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="admin-dashboard">
+<div class="clerk-dashboard">
     <!-- Header Section -->
     <div class="dashboard-header">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="dashboard-title">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Admin Dashboard
+                        <i class="fas fa-user-tie"></i>
+                        My Sales Dashboard
                     </h1>
-                    <p class="dashboard-subtitle">Welcome back, {{ auth()->user()->name }}! Here's your business overview.</p>
+                    <p class="dashboard-subtitle">Welcome back, {{ auth()->user()->name }}! Track your personal sales performance.</p>
                 </div>
                 <div class="col-md-4 text-right">
                     <div class="date-info">
@@ -24,38 +24,41 @@
     </div>
 
     <div class="container-fluid">
-        <!-- KPI Cards -->
+        <!-- Personal KPI Cards -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-3">
                 <div class="stat-card primary">
                     <div class="stat-icon">
-                        <i class="fas fa-dollar-sign"></i>
+                        <i class="fas fa-calendar-day"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">${{ number_format($totalSales, 0) }}</div>
-                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">${{ number_format($todaySales, 0) }}</div>
+                        <div class="stat-label">Today's Sales</div>
+                        <div class="stat-extra">{{ $todayOrders }} {{ Str::plural('order', $todayOrders) }}</div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-3">
                 <div class="stat-card success">
                     <div class="stat-icon">
-                        <i class="fas fa-shopping-cart"></i>
+                        <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">{{ number_format($totalOrders) }}</div>
-                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value">${{ number_format($totalSales, 0) }}</div>
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-extra">All time earnings</div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-3">
                 <div class="stat-card info">
                     <div class="stat-icon">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-shopping-cart"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">{{ $totalClerks }}</div>
-                        <div class="stat-label">Active Clerks</div>
+                        <div class="stat-value">{{ number_format($totalOrders) }}</div>
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-extra">Orders processed</div>
                     </div>
                 </div>
             </div>
@@ -67,6 +70,7 @@
                     <div class="stat-content">
                         <div class="stat-value">${{ number_format($averageOrderValue, 0) }}</div>
                         <div class="stat-label">Avg Order Value</div>
+                        <div class="stat-extra">Per transaction</div>
                     </div>
                 </div>
             </div>
@@ -74,32 +78,32 @@
 
         <!-- Main Charts Row -->
         <div class="row mb-4">
-            <!-- Sales Trend Chart -->
+            <!-- Personal Sales Trend -->
             <div class="col-lg-8 mb-4">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <i class="fas fa-chart-area"></i>
-                            Sales Trend - Last 30 Days
+                            My Sales Trend - Last 14 Days
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="salesTrendChart" height="100"></canvas>
+                        <canvas id="personalSalesTrend" height="100"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Sales by Category -->
+            <!-- My Category Performance -->
             <div class="col-lg-4 mb-4">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <i class="fas fa-chart-pie"></i>
-                            Sales by Category
+                            My Sales by Category
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="categoryChart" height="200"></canvas>
+                        <canvas id="myCategoryChart" height="200"></canvas>
                     </div>
                 </div>
             </div>
@@ -107,65 +111,84 @@
 
         <!-- Secondary Charts Row -->
         <div class="row mb-4">
-            <!-- Monthly Sales -->
+            <!-- Weekly Performance -->
             <div class="col-lg-6 mb-4">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <i class="fas fa-chart-bar"></i>
-                            Monthly Sales - Last 12 Months
+                            Weekly Performance - Last 8 Weeks
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="monthlySalesChart" height="150"></canvas>
+                        <canvas id="weeklyPerformanceChart" height="150"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Top Clerks Performance -->
+            <!-- Top Products I Sell -->
             <div class="col-lg-6 mb-4">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-user-tie"></i>
-                            Top Performing Clerks
+                            <i class="fas fa-star"></i>
+                            My Top Selling Products
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="clerkPerformanceChart" height="150"></canvas>
+                        <canvas id="myTopProductsChart" height="150"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Additional Charts Row -->
+        <!-- Performance Analytics Row -->
         <div class="row mb-4">
-            <!-- Hourly Sales Pattern -->
-            <div class="col-lg-8 mb-4">
+            <!-- Hourly Performance Pattern -->
+            <div class="col-lg-12 mb-4">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
                             <i class="fas fa-clock"></i>
-                            Today's Hourly Sales Pattern
+                            My Performance Pattern - Average by Hour (Last 7 Days)
                         </h3>
                     </div>
                     <div class="chart-body">
-                        <canvas id="hourlyChart" height="120"></canvas>
+                        <canvas id="hourlyPatternChart" height="120"></canvas>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Top Products -->
-            <div class="col-lg-4 mb-4">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">
-                            <i class="fas fa-trophy"></i>
-                            Top Products
-                        </h3>
-                    </div>
-                    <div class="chart-body">
-                        <canvas id="topProductsChart" height="300"></canvas>
+        <!-- Quick Stats Row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="performance-summary">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="performance-item">
+                                <div class="performance-number">{{ number_format($totalOrders) }}</div>
+                                <div class="performance-label">Orders Completed</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="performance-item">
+                                <div class="performance-number">${{ number_format($averageOrderValue, 2) }}</div>
+                                <div class="performance-label">Average Sale</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="performance-item">
+                                <div class="performance-number">${{ number_format($todaySales, 2) }}</div>
+                                <div class="performance-label">Today's Target</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="performance-item">
+                                <div class="performance-number">{{ count($topProducts) }}</div>
+                                <div class="performance-label">Products Sold</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,45 +200,56 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Professional color palette
+    // Personal color palette for clerk dashboard
     const colors = {
-        primary: '#667eea',
-        primaryLight: 'rgba(102, 126, 234, 0.2)',
-        success: '#28a745',
-        successLight: 'rgba(40, 167, 69, 0.2)',
-        info: '#17a2b8',
-        infoLight: 'rgba(23, 162, 184, 0.2)',
-        warning: '#ffc107',
-        warningLight: 'rgba(255, 193, 7, 0.2)',
-        danger: '#dc3545',
-        gradient: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe']
+        primary: '#4F46E5',    // Indigo
+        primaryLight: 'rgba(79, 70, 229, 0.1)',
+        secondary: '#7C3AED',  // Purple
+        secondaryLight: 'rgba(124, 58, 237, 0.1)',
+        success: '#059669',    // Emerald
+        successLight: 'rgba(5, 150, 105, 0.1)',
+        info: '#0EA5E9',       // Sky Blue
+        infoLight: 'rgba(14, 165, 233, 0.1)',
+        warning: '#F59E0B',    // Amber
+        warningLight: 'rgba(245, 158, 11, 0.1)',
+        gradient: [
+            '#4F46E5', // Indigo
+            '#7C3AED', // Purple
+            '#059669', // Emerald
+            '#0EA5E9', // Sky Blue
+            '#F59E0B', // Amber
+            '#EC4899', // Pink
+            '#8B5CF6', // Violet
+            '#3B82F6'  // Blue
+        ]
     };
 
-    // Sales Trend Chart
-    const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
-    const salesTrendData = @json($salesTrend);
+    // Personal Sales Trend Chart
+    const personalSalesCtx = document.getElementById('personalSalesTrend').getContext('2d');
+    const personalSalesData = @json($salesTrend);
     
-    new Chart(salesTrendCtx, {
+    new Chart(personalSalesCtx, {
         type: 'line',
         data: {
-            labels: salesTrendData.map(item => item.date),
+            labels: personalSalesData.map(item => item.date),
             datasets: [{
-                label: 'Sales ($)',
-                data: salesTrendData.map(item => item.sales),
+                label: 'My Sales ($)',
+                data: personalSalesData.map(item => item.sales),
                 borderColor: colors.primary,
                 backgroundColor: colors.primaryLight,
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4,
                 pointBackgroundColor: colors.primary,
-                pointRadius: 4,
+                pointRadius: 5,
                 pointHoverRadius: 8
             }, {
                 label: 'Orders',
-                data: salesTrendData.map(item => item.orders),
+                data: personalSalesData.map(item => item.orders),
                 borderColor: colors.success,
-                backgroundColor: colors.successLight,
+                backgroundColor: 'transparent',
                 borderWidth: 2,
+                borderDash: [5, 5],
                 fill: false,
                 tension: 0.4,
                 yAxisID: 'y1'
@@ -262,17 +296,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Category Chart
-    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-    const categoryData = @json($salesByCategory);
+    // My Category Chart
+    const myCategoryCtx = document.getElementById('myCategoryChart').getContext('2d');
+    const myCategoryData = @json($salesByCategory);
     
-    new Chart(categoryCtx, {
+    new Chart(myCategoryCtx, {
         type: 'doughnut',
         data: {
-            labels: categoryData.map(item => item.category_name),
+            labels: myCategoryData.map(item => item.category_name),
             datasets: [{
-                data: categoryData.map(item => item.total_sales),
-                backgroundColor: colors.gradient.slice(0, categoryData.length),
+                data: myCategoryData.map(item => item.total_sales),
+                backgroundColor: colors.gradient.slice(0, myCategoryData.length),
                 borderWidth: 0,
                 hoverBorderWidth: 3,
                 hoverBorderColor: '#fff'
@@ -281,31 +315,34 @@ document.addEventListener('DOMContentLoaded', function () {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '65%',
             plugins: {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 20,
-                        usePointStyle: true
+                        padding: 15,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
                     }
                 }
             }
         }
     });
 
-    // Monthly Sales Chart
-    const monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
-    const monthlySalesData = @json($monthlySales);
+    // Weekly Performance Chart
+    const weeklyPerformanceCtx = document.getElementById('weeklyPerformanceChart').getContext('2d');
+    const weeklyPerformanceData = @json($weeklySales);
     
-    new Chart(monthlySalesCtx, {
+    new Chart(weeklyPerformanceCtx, {
         type: 'bar',
         data: {
-            labels: monthlySalesData.map(item => item.month),
+            labels: weeklyPerformanceData.map(item => item.week),
             datasets: [{
-                label: 'Monthly Sales',
-                data: monthlySalesData.map(item => item.sales),
-                backgroundColor: colors.primary,
+                label: 'Weekly Sales',
+                data: weeklyPerformanceData.map(item => item.sales),
+                backgroundColor: colors.info,
                 borderRadius: 8,
                 borderSkipped: false
             }]
@@ -331,18 +368,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Clerk Performance Chart
-    const clerkCtx = document.getElementById('clerkPerformanceChart').getContext('2d');
-    const clerkData = @json($topClerks);
+    // My Top Products Chart
+    const myTopProductsCtx = document.getElementById('myTopProductsChart').getContext('2d');
+    const myTopProductsData = @json($topProducts);
     
-    new Chart(clerkCtx, {
+    new Chart(myTopProductsCtx, {
         type: 'horizontalBar',
         data: {
-            labels: clerkData.map(item => item.name),
+            labels: myTopProductsData.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
             datasets: [{
-                label: 'Total Sales',
-                data: clerkData.map(item => item.total_sales),
-                backgroundColor: colors.success,
+                label: 'Quantity Sold',
+                data: myTopProductsData.map(item => item.total_quantity),
+                backgroundColor: colors.secondary,
                 borderRadius: 4
             }]
         },
@@ -357,30 +394,30 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             scales: {
                 x: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
+                    beginAtZero: true
                 }
             }
         }
     });
 
-    // Hourly Chart
-    const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
-    const hourlyData = @json($hourlyData);
+    // Hourly Pattern Chart
+    const hourlyPatternCtx = document.getElementById('hourlyPatternChart').getContext('2d');
+    const hourlyPatternData = @json($hourlyData);
     
-    new Chart(hourlyCtx, {
-        type: 'bar',
+    new Chart(hourlyPatternCtx, {
+        type: 'line',
         data: {
-            labels: hourlyData.map(item => item.hour),
+            labels: hourlyPatternData.map(item => item.hour),
             datasets: [{
-                label: 'Hourly Sales',
-                data: hourlyData.map(item => item.sales),
-                backgroundColor: colors.info,
-                borderRadius: 4
+                label: 'Average Sales per Hour',
+                data: hourlyPatternData.map(item => item.avg_sales),
+                borderColor: colors.warning,
+                backgroundColor: colors.warningLight,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: colors.warning,
+                pointRadius: 4
             }]
         },
         options: {
@@ -396,39 +433,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // Top Products Chart
-    const productsCtx = document.getElementById('topProductsChart').getContext('2d');
-    const productsData = @json($topProducts);
-    
-    new Chart(productsCtx, {
-        type: 'pie',
-        data: {
-            labels: productsData.map(item => item.name),
-            datasets: [{
-                data: productsData.map(item => item.total_quantity),
-                backgroundColor: colors.gradient.slice(0, productsData.length),
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        font: {
-                            size: 11
+                            return '$' + value.toFixed(0);
                         }
                     }
                 }
@@ -439,14 +444,15 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <style>
-.admin-dashboard {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+.clerk-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 0;
 }
 
 .dashboard-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
@@ -476,13 +482,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .stat-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    border-left: 4px solid;
     position: relative;
     overflow: hidden;
+    border: none;
 }
 
 .stat-card::before {
@@ -490,56 +496,40 @@ document.addEventListener('DOMContentLoaded', function () {
     position: absolute;
     top: 0;
     right: 0;
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    opacity: 0.1;
+    opacity: 0.08;
     transform: translate(30%, -30%);
 }
 
-.stat-card.primary {
-    border-left-color: #667eea;
-}
-
 .stat-card.primary::before {
-    background: #667eea;
-}
-
-.stat-card.success {
-    border-left-color: #28a745;
+    background: #2196F3;
 }
 
 .stat-card.success::before {
-    background: #28a745;
-}
-
-.stat-card.info {
-    border-left-color: #17a2b8;
+    background: #4CAF50;
 }
 
 .stat-card.info::before {
-    background: #17a2b8;
-}
-
-.stat-card.warning {
-    border-left-color: #ffc107;
+    background: #00BCD4;
 }
 
 .stat-card.warning::before {
-    background: #ffc107;
+    background: #FF9800;
 }
 
 .stat-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
 
 .stat-icon {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    font-size: 2rem;
-    opacity: 0.3;
+    font-size: 2.2rem;
+    opacity: 0.2;
     z-index: 1;
 }
 
@@ -549,54 +539,91 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 .stat-value {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     font-weight: 700;
     color: #2c3e50;
     margin-bottom: 0.5rem;
+    line-height: 1;
 }
 
 .stat-label {
     font-size: 1rem;
     color: #7f8c8d;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-extra {
+    font-size: 0.875rem;
+    color: #95a5a6;
+    font-style: italic;
 }
 
 .chart-card {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: all 0.3s ease;
     height: 100%;
+    border: none;
 }
 
 .chart-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
 }
 
 .chart-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
     padding: 1.5rem;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #e1f5fe;
 }
 
 .chart-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
-    color: #495057;
+    color: #37474f;
     margin: 0;
 }
 
 .chart-title i {
     margin-right: 0.75rem;
-    color: #667eea;
+    color: #2196F3;
 }
 
 .chart-body {
     padding: 2rem;
+}
+
+.performance-summary {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+}
+
+.performance-item {
+    padding: 1rem;
+}
+
+.performance-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2196F3;
+    margin-bottom: 0.5rem;
+}
+
+.performance-label {
+    font-size: 0.9rem;
+    color: #607d8b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 @media (max-width: 768px) {
@@ -610,6 +637,10 @@ document.addEventListener('DOMContentLoaded', function () {
     
     .stat-card {
         margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2.2rem;
     }
 }
 </style>
