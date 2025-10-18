@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="clerk-dashboard">
+<div class="clerk-dashboard p-4">
     <!-- Header Section -->
-    <div class="dashboard-header">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-8">
+    <div class="dashboard-header mb-6">
+        <div class="max-w-full mx-auto px-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="mb-4 md:mb-0">
                     <h1 class="dashboard-title">
                         <i class="fas fa-user-tie"></i>
                         My Sales Dashboard
                     </h1>
                     <p class="dashboard-subtitle">Welcome back, {{ auth()->user()->name }}! Track your personal sales performance.</p>
                 </div>
-                <div class="col-md-4 text-right">
+                <div class="text-right">
                     <div class="date-info">
                         <i class="fas fa-calendar-alt"></i>
                         {{ now()->format('l, F d, Y') }}
@@ -23,10 +23,10 @@
         </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="max-w-full mx-auto px-4">
         <!-- Personal KPI Cards -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div>
                 <div class="stat-card primary">
                     <div class="stat-icon">
                         <i class="fas fa-calendar-day"></i>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
+            <div>
                 <div class="stat-card success">
                     <div class="stat-icon">
                         <i class="fas fa-dollar-sign"></i>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
+            <div>
                 <div class="stat-card info">
                     <div class="stat-icon">
                         <i class="fas fa-shopping-cart"></i>
@@ -62,7 +62,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
+            <div>
                 <div class="stat-card warning">
                     <div class="stat-icon">
                         <i class="fas fa-chart-line"></i>
@@ -77,9 +77,9 @@
         </div>
 
         <!-- Main Charts Row -->
-        <div class="row mb-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Personal Sales Trend -->
-            <div class="col-lg-8 mb-4">
+            <div class="lg:col-span-2">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
@@ -94,7 +94,7 @@
             </div>
 
             <!-- My Category Performance -->
-            <div class="col-lg-4 mb-4">
+            <div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
@@ -110,9 +110,9 @@
         </div>
 
         <!-- Secondary Charts Row -->
-        <div class="row mb-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Weekly Performance -->
-            <div class="col-lg-6 mb-4">
+            <div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
@@ -127,7 +127,7 @@
             </div>
 
             <!-- Top Products I Sell -->
-            <div class="col-lg-6 mb-4">
+            <div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
@@ -143,9 +143,9 @@
         </div>
 
         <!-- Performance Analytics Row -->
-        <div class="row mb-4">
+        <div class="grid grid-cols-1 gap-6 mb-6">
             <!-- Hourly Performance Pattern -->
-            <div class="col-lg-12 mb-4">
+            <div>
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
@@ -161,29 +161,29 @@
         </div>
 
         <!-- Quick Stats Row -->
-        <div class="row">
-            <div class="col-lg-12">
+        <div class="grid grid-cols-1 gap-6">
+            <div>
                 <div class="performance-summary">
-                    <div class="row">
-                        <div class="col-md-3 text-center">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="text-center">
                             <div class="performance-item">
                                 <div class="performance-number">{{ number_format($totalOrders) }}</div>
                                 <div class="performance-label">Orders Completed</div>
                             </div>
                         </div>
-                        <div class="col-md-3 text-center">
+                        <div class="text-center">
                             <div class="performance-item">
                                 <div class="performance-number">${{ number_format($averageOrderValue, 2) }}</div>
                                 <div class="performance-label">Average Sale</div>
                             </div>
                         </div>
-                        <div class="col-md-3 text-center">
+                        <div class="text-center">
                             <div class="performance-item">
                                 <div class="performance-number">${{ number_format($todaySales, 2) }}</div>
                                 <div class="performance-label">Today's Target</div>
                             </div>
                         </div>
-                        <div class="col-md-3 text-center">
+                        <div class="text-center">
                             <div class="performance-item">
                                 <div class="performance-number">{{ count($topProducts) }}</div>
                                 <div class="performance-label">Products Sold</div>
@@ -202,244 +202,254 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Personal color palette for clerk dashboard
     const colors = {
-        primary: '#4F46E5',    // Indigo
+        primary: '#4F46E5',
         primaryLight: 'rgba(79, 70, 229, 0.1)',
-        secondary: '#7C3AED',  // Purple
+        secondary: '#7C3AED',
         secondaryLight: 'rgba(124, 58, 237, 0.1)',
-        success: '#059669',    // Emerald
+        success: '#059669',
         successLight: 'rgba(5, 150, 105, 0.1)',
-        info: '#0EA5E9',       // Sky Blue
+        info: '#0EA5E9',
         infoLight: 'rgba(14, 165, 233, 0.1)',
-        warning: '#F59E0B',    // Amber
+        warning: '#F59E0B',
         warningLight: 'rgba(245, 158, 11, 0.1)',
         gradient: [
-            '#4F46E5', // Indigo
-            '#7C3AED', // Purple
-            '#059669', // Emerald
-            '#0EA5E9', // Sky Blue
-            '#F59E0B', // Amber
-            '#EC4899', // Pink
-            '#8B5CF6', // Violet
-            '#3B82F6'  // Blue
+            '#4F46E5',
+            '#7C3AED',
+            '#059669',
+            '#0EA5E9',
+            '#F59E0B',
+            '#EC4899',
+            '#8B5CF6',
+            '#3B82F6'
         ]
     };
 
     // Personal Sales Trend Chart
-    const personalSalesCtx = document.getElementById('personalSalesTrend').getContext('2d');
-    const personalSalesData = @json($salesTrend);
-    
-    new Chart(personalSalesCtx, {
-        type: 'line',
-        data: {
-            labels: personalSalesData.map(item => item.date),
-            datasets: [{
-                label: 'My Sales ($)',
-                data: personalSalesData.map(item => item.sales),
-                borderColor: colors.primary,
-                backgroundColor: colors.primaryLight,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: colors.primary,
-                pointRadius: 5,
-                pointHoverRadius: 8
-            }, {
-                label: 'Orders',
-                data: personalSalesData.map(item => item.orders),
-                borderColor: colors.success,
-                backgroundColor: 'transparent',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                fill: false,
-                tension: 0.4,
-                yAxisID: 'y1'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index'
+    const personalSalesCtx = document.getElementById('personalSalesTrend');
+    if (personalSalesCtx) {
+        const personalSalesData = @json($salesTrend ?? []);
+        
+        new Chart(personalSalesCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: personalSalesData.map(item => item.date),
+                datasets: [{
+                    label: 'My Sales ($)',
+                    data: personalSalesData.map(item => item.sales),
+                    borderColor: colors.primary,
+                    backgroundColor: colors.primaryLight,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: colors.primary,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Orders',
+                    data: personalSalesData.map(item => item.orders),
+                    borderColor: colors.success,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }]
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
                         }
                     }
                 },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    beginAtZero: true,
-                    grid: {
-                        drawOnChartArea: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false,
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
     // My Category Chart
-    const myCategoryCtx = document.getElementById('myCategoryChart').getContext('2d');
-    const myCategoryData = @json($salesByCategory);
-    
-    new Chart(myCategoryCtx, {
-        type: 'doughnut',
-        data: {
-            labels: myCategoryData.map(item => item.category_name),
-            datasets: [{
-                data: myCategoryData.map(item => item.total_sales),
-                backgroundColor: colors.gradient.slice(0, myCategoryData.length),
-                borderWidth: 0,
-                hoverBorderWidth: 3,
-                hoverBorderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        font: {
-                            size: 12
+    const myCategoryCtx = document.getElementById('myCategoryChart');
+    if (myCategoryCtx) {
+        const myCategoryData = @json($salesByCategory ?? []);
+        
+        new Chart(myCategoryCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: myCategoryData.map(item => item.category_name),
+                datasets: [{
+                    data: myCategoryData.map(item => item.total_sales),
+                    backgroundColor: colors.gradient.slice(0, myCategoryData.length),
+                    borderWidth: 0,
+                    hoverBorderWidth: 3,
+                    hoverBorderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
     // Weekly Performance Chart
-    const weeklyPerformanceCtx = document.getElementById('weeklyPerformanceChart').getContext('2d');
-    const weeklyPerformanceData = @json($weeklySales);
-    
-    new Chart(weeklyPerformanceCtx, {
-        type: 'bar',
-        data: {
-            labels: weeklyPerformanceData.map(item => item.week),
-            datasets: [{
-                label: 'Weekly Sales',
-                data: weeklyPerformanceData.map(item => item.sales),
-                backgroundColor: colors.info,
-                borderRadius: 8,
-                borderSkipped: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    const weeklyPerformanceCtx = document.getElementById('weeklyPerformanceChart');
+    if (weeklyPerformanceCtx) {
+        const weeklyPerformanceData = @json($weeklySales ?? []);
+        
+        new Chart(weeklyPerformanceCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: weeklyPerformanceData.map(item => item.week),
+                datasets: [{
+                    label: 'Weekly Sales',
+                    data: weeklyPerformanceData.map(item => item.sales),
+                    backgroundColor: colors.info,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
     // My Top Products Chart
-    const myTopProductsCtx = document.getElementById('myTopProductsChart').getContext('2d');
-    const myTopProductsData = @json($topProducts);
-    
-    new Chart(myTopProductsCtx, {
-        type: 'horizontalBar',
-        data: {
-            labels: myTopProductsData.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
-            datasets: [{
-                label: 'Quantity Sold',
-                data: myTopProductsData.map(item => item.total_quantity),
-                backgroundColor: colors.secondary,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            plugins: {
-                legend: {
-                    display: false
-                }
+    const myTopProductsCtx = document.getElementById('myTopProductsChart');
+    if (myTopProductsCtx) {
+        const myTopProductsData = @json($topProducts ?? []);
+        
+        new Chart(myTopProductsCtx.getContext('2d'), {
+            type: 'horizontalBar',
+            data: {
+                labels: myTopProductsData.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
+                datasets: [{
+                    label: 'Quantity Sold',
+                    data: myTopProductsData.map(item => item.total_quantity),
+                    backgroundColor: colors.secondary,
+                    borderRadius: 4
+                }]
             },
-            scales: {
-                x: {
-                    beginAtZero: true
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 
     // Hourly Pattern Chart
-    const hourlyPatternCtx = document.getElementById('hourlyPatternChart').getContext('2d');
-    const hourlyPatternData = @json($hourlyData);
-    
-    new Chart(hourlyPatternCtx, {
-        type: 'line',
-        data: {
-            labels: hourlyPatternData.map(item => item.hour),
-            datasets: [{
-                label: 'Average Sales per Hour',
-                data: hourlyPatternData.map(item => item.avg_sales),
-                borderColor: colors.warning,
-                backgroundColor: colors.warningLight,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: colors.warning,
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    const hourlyPatternCtx = document.getElementById('hourlyPatternChart');
+    if (hourlyPatternCtx) {
+        const hourlyPatternData = @json($hourlyData ?? []);
+        
+        new Chart(hourlyPatternCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: hourlyPatternData.map(item => item.hour),
+                datasets: [{
+                    label: 'Average Sales per Hour',
+                    data: hourlyPatternData.map(item => item.avg_sales),
+                    borderColor: colors.warning,
+                    backgroundColor: colors.warningLight,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: colors.warning,
+                    pointRadius: 4
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toFixed(0);
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 });
 </script>
 
@@ -447,15 +457,12 @@ document.addEventListener('DOMContentLoaded', function () {
 .clerk-dashboard {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    padding: 0;
 }
 
 .dashboard-header {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
@@ -485,7 +492,6 @@ document.addEventListener('DOMContentLoaded', function () {
     border-radius: 20px;
     padding: 2rem;
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     border: none;
@@ -517,11 +523,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .stat-card.warning::before {
     background: #FF9800;
-}
-
-.stat-card:hover {
-    transform: translateY(-15px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
 
 .stat-icon {
@@ -566,14 +567,8 @@ document.addEventListener('DOMContentLoaded', function () {
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     overflow: hidden;
-    transition: all 0.3s ease;
     height: 100%;
     border: none;
-}
-
-.chart-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
 }
 
 .chart-header {
