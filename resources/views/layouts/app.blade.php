@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <title>{{ config('app.name', 'Business Gateway POS') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     <style>
@@ -17,89 +15,96 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .sidebar-gradient {
-            background: linear-gradient(180deg, #2545d4 0%, #1e3a8a 100%);
-        }
-
-        .nav-item {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .nav-item:hover::before {
-            left: 100%;
-        }
-
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            border-right: 4px solid #60a5fa;
-        }
-
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.05);
+        .sidebar {
+            background: #2d3748;
+            color: white;
+            width: 250px;
+            min-height: 100vh;
         }
 
         .main-content {
-            background: linear-gradient(135deg, #f5f5dc 0%, #e5e5d5 100%);
+            background: #f7fafc;
             overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #2545d4 #f1f1f1;
         }
 
         .main-content::-webkit-scrollbar {
-            width: 6px;
+            width: 10px;
         }
 
         .main-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
+            background: #edf2f7;
         }
 
         .main-content::-webkit-scrollbar-thumb {
-            background: #2545d4;
-            border-radius: 3px;
+            background: #4a5568;
+            /* border-radius: 3px; */
         }
 
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: #1e3a8a;
+        .nav-item {
+            display: flex; /* Ensure flex is applied directly to nav-item */
+            align-items: center; /* Vertically align items */
+            padding: 8px 12px; /* Increased padding for better spacing */
+            color: white;
+            border-radius: 6px;
+            margin-bottom: 4px; /* Added a small margin between items */
+        }
+
+        .nav-item.active {
+            background: #4a5568;
         }
 
         .nav-icon-container {
-            @apply w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center mr-3 group-hover:bg-white/20 transition-colors;
+            width: 24px; /* Increased width for better icon visibility */
+            height: 24px; /* Increased height */
+            background: #4a5568;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px; /* Increased margin for better separation from text */
+            flex-shrink: 0; /* Prevent icon container from shrinking */
         }
 
         .nav-icon {
-            @apply text-sm;
+            font-size: 16px; /* Adjusted icon size to fit better in the container */
+            color: white; /* Ensure icon color is white */
         }
 
         .logo-container {
-            @apply w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center glass-effect;
+            width: 40px; /* Increased logo container size */
+            height: 40px; /* Increased logo container size */
+            background: #4a5568;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Adjust the image size within the logo container */
+        .logo-container img {
+            height: 24px; /* Adjusted image size */
+            width: 24px; /* Adjusted image size */
+            object-fit: contain;
         }
 
         .profile-icon {
-            @apply w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base;
+            width: 48px; /* Increased profile icon size */
+            height: 48px; /* Increased profile icon size */
+            background: #4a5568;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px; /* Adjusted font size for initial */
         }
 
         .sidebar-nav {
             height: calc(100vh - 200px);
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #60a5fa #2545d4;
-            margin-right: -8px;
-            padding-right: 8px;
+            scrollbar-color: #4a5568 #2d3748;
         }
 
         .sidebar-nav::-webkit-scrollbar {
@@ -107,136 +112,110 @@
         }
 
         .sidebar-nav::-webkit-scrollbar-track {
-            background: #2545d4;
+            background: #2d3748;
             border-radius: 2px;
         }
 
         .sidebar-nav::-webkit-scrollbar-thumb {
-            background: #60a5fa;
+            background: #4a5568;
             border-radius: 2px;
-        }
-
-        .sidebar-nav::-webkit-scrollbar-thumb:hover {
-            background: #93c5fd;
-        }
-
-        #welcome-message {
-            opacity: 1;
-            transition: opacity 0.5s ease-out;
         }
     </style>
 </head>
 
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-gray-100 font-sans">
     <div class="flex h-screen overflow-hidden">
-        <aside class="sidebar-gradient text-white w-64 min-h-screen print:hidden shadow-lg relative">
-            <div class="p-4 border-b border-white/20">
+        <aside class="sidebar text-white w-64 min-h-screen print:hidden">
+            <div class="p-4 border-b border-gray-600">
                 <div class="flex items-center justify-center">
-                    <div class="relative">
-                        <div class="logo-container">
-                            <img src="{{ asset('storage/logos/mkdev.png') }}" alt="Logo" class="h-8 w-8 object-contain">
-                        </div>
-                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl blur opacity-30"></div>
+                    <div class="logo-container">
+                        <img src="{{ asset('storage/logos/mkdev.png') }}" alt="Logo" class="h-8 w-8 object-contain">
                     </div>
                 </div>
                 <div class="text-center mt-2">
-                    <h1 class="text-lg font-bold text-white">Business Gateway</h1>
-                    <p class="text-blue-200 text-xs">Point of Sale System</p>
+                    <h1 class="text-lg font-semibold text-white">Business Gateway</h1>
+                    <p class="text-gray-300 text-xs">Point of Sale System</p>
                 </div>
             </div>
 
             <nav class="sidebar-nav mt-4 px-4">
                 <a href="/dashboard"
-                    class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <div class="flex items-center">
-                        <div class="nav-icon-container">
-                            <i class="fas fa-tachometer-alt nav-icon"></i>
-                        </div>
-                        <span class="font-medium">{{ __('Dashboard') }}</span>
+                    class="nav-item flex items-center {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <div class="nav-icon-container">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
                     </div>
+                    <span class="font-medium">{{ __('Dashboard') }}</span>
                 </a>
 
                 @if (auth()->user()->role === 'admin')
                     <div class="mb-4">
-                        <h3 class="text-blue-200 text-xs uppercase tracking-wider font-semibold mb-2 px-4">Administration</h3>
+                        <h3 class="text-gray-300 text-xs uppercase font-semibold mb-2 px-4">Administration</h3>
                         <a href="{{ route('categories.index') }}"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-tags nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Categories') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-tags nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Categories') }}</span>
                         </a>
                         <a href="{{ route('products.index') }}"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-box nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Products') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-box nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Products') }}</span>
                         </a>
                         <a href="/admin/orders"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-chart-line nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Sales') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-chart-line nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Sales') }}</span>
                         </a>
                         <a href="{{ route('users.index') }}"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-users nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Users') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-users nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Users') }}</span>
                         </a>
                     </div>
                 @elseif(auth()->user()->role === 'clerk')
                     <div class="mb-4">
-                        <h3 class="text-blue-200 text-xs uppercase tracking-wider font-semibold mb-2 px-4">Sales Operations</h3>
+                        <h3 class="text-gray-300 text-xs uppercase font-semibold mb-2 px-4">Sales Operations</h3>
                         <a href="{{ route('pos.index') }}"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('pos.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-cash-register nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Point of Sale') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('pos.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-cash-register nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Point of Sale') }}</span>
                         </a>
                         <a href="{{ route('orders.index') }}"
-                            class="nav-item block px-4 py-3 text-white hover:bg-white/10 rounded-lg mb-2 group {{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                            <div class="flex items-center">
-                                <div class="nav-icon-container">
-                                    <i class="fas fa-receipt nav-icon"></i>
-                                </div>
-                                <span class="font-medium">{{ __('Sales') }}</span>
+                            class="nav-item flex items-center {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                            <div class="nav-icon-container">
+                                <i class="fas fa-receipt nav-icon"></i>
                             </div>
+                            <span class="font-medium">{{ __('Sales') }}</span>
                         </a>
                     </div>
                 @endif
             </nav>
 
-            <div class="absolute bottom-0 w-64 border-t border-white/20">
+            <div class="absolute bottom-0 w-64 border-t border-gray-600">
                 <div class="p-4">
-                    <div class="bg-white/10 rounded-lg p-3 glass-effect">
+                    <div class="bg-gray-700 rounded-lg p-3">
                         <div class="flex items-center mb-3">
                             <div class="profile-icon">
                                 {{ substr(auth()->user()->name, 0, 1) }}
                             </div>
                             <div class="ml-3">
                                 <div class="font-semibold text-white text-sm">{{ auth()->user()->name }}</div>
-                                <div class="text-blue-200 text-xs capitalize">{{ auth()->user()->role }}</div>
+                                <div class="text-gray-300 text-xs capitalize">{{ auth()->user()->role }}</div>
                             </div>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full flex items-center justify-center px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-md transition-all duration-200 group">
+                                class="w-full flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-md">
                                 <i class="fas fa-sign-out-alt mr-2"></i>
                                 {{ __('Log Out') }}
                             </button>
@@ -247,9 +226,9 @@
         </aside>
 
         <div class="flex-1 flex flex-col overflow-hidden">
-            <div class="md:hidden p-4 bg-white border-b">
+            <div class="md:hidden p-4 bg-white border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <button class="p-2 rounded-md bg-[#2545d4] text-white hover:bg-[#1e3a8a]">
+                    <button class="p-2 rounded-md bg-gray-700 text-white">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -262,74 +241,21 @@
 
             <main class="flex-1 main-content">
                 <div class="container mx-auto px-6 py-8">
-                    <div class="mb-6">
-                        <div id="welcome-message" class="bg-white rounded-lg shadow-md p-6 opacity-100 transition-opacity duration-500">
-                            <h1 class="text-xl font-bold text-gray-800 mb-2">Welcome back, {{ auth()->user()->name }}!</h1>
-                            <p class="text-gray-600 text-sm">Here's what's happening with your business today.</p>
+                    @if (session('status') === 'login' && !session()->has('welcome_message_displayed'))
+                        <div class="mb-6">
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <h1 class="text-xl font-bold text-gray-800 mb-2">Welcome back, {{ auth()->user()->name }}!</h1>
+                                <p class="text-gray-600 text-sm">Here's what's happening with your business today.</p>
+                            </div>
                         </div>
-                    </div>
+                        {{ session()->flash('welcome_message_displayed', true) }}
+                    @endif
                     @yield('content')
                 </div>
             </main>
         </div>
     </div>
 
-    <script>
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple');
-
-                this.appendChild(ripple);
-
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-            });
-        });
-
-        // Welcome message fade out
-        document.addEventListener('DOMContentLoaded', function() {
-            const welcomeMessage = document.getElementById('welcome-message');
-            
-            if (welcomeMessage) {
-                setTimeout(() => {
-                    welcomeMessage.style.opacity = '0';
-                    setTimeout(() => {
-                        welcomeMessage.style.display = 'none';
-                    }, 500); // Wait for fade out animation to complete
-                }, 5000); // 5 seconds delay
-            }
-        });
-    </script>
-
-    <style>
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(0);
-            animation: ripple-animation 0.6s linear;
-            pointer-events: none;
-        }
-
-        @keyframes ripple-animation {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    </style>
-
     @stack('scripts')
 </body>
-
 </html>
