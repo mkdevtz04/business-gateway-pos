@@ -31,12 +31,12 @@ class StockController extends Controller
         return view('stocks.index', compact('products', 'categories', 'lowStockCount'));
     }
 
-    // public function exportPdf()
-    // {
-    //     $products = Product::with('category')->get();
-    //     $pdf = Pdf::loadView('stocks.pdf', compact('products'));
-    //     return $pdf->download('stock_report.pdf');
-    // }
+    public function exportPdf()
+    {
+        $products = Product::with('category')->orderBy('name')->get();
+        $pdf = Pdf::loadView('stocks.pdf', compact('products'));
+        return $pdf->download('stock_report_' . now()->format('Y-m-d') . '.pdf');
+    }
 
     public function exportCsv()
     {

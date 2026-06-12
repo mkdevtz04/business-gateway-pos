@@ -26,66 +26,82 @@ class POSController extends Controller
             DB::beginTransaction();
 
             $request->validate([
-                'products' => 'required|array|min:1',
-                'products.*.id' => 'required|exists:products,id',
+                'products'          => 'required|array|min:1',
+                'products.*.id'     => 'required|exists:products,id',
                 'products.*.quantity' => 'required|integer|min:1',
-                'payment_method' => 'required|in:cash,credit',
-                'customer_id' => 'required|string', // can be an ID or "new"
-                'customer_name' => 'required_if:customer_id,new|string|max:255',
-                'customer_contact' => 'nullable|string|max:255',
+                'payment_method'    => 'required|in:cash,credit',
+                'customer_id'       => 'required|string',
+                'customer_name'     => 'required_if:customer_id,new|string|max:255',
+                'customer_contact'  => 'nullable|string|max:255',
+                'discount_type'     => 'nullable|in:percent,flat',
+                'discount_value'    => 'nullable|numeric|min:0',
             ]);
 
-            // === Customer Logic ===
+            // Resolve customer
             $customerId = null;
             if ($request->customer_id === 'new') {
-                $customer = Customer::create([
-                    'name' => $request->customer_name,
-                    'contact' => $request->customer_contact,
-                ]);
+                $customer   = Customer::create(['name' => $request->customer_name, 'contact' => $request->customer_contact]);
                 $customerId = $customer->id;
-            } else {
+            } elseif ($request->customer_id && $request->customer_id !== '') {
                 $customerId = $request->customer_id;
             }
-            // ======================
 
-            $totalAmount = 0;
+            $grossTotal = 0;
             $orderItems = [];
 
             foreach ($request->products as $item) {
-                // ... (product processing logic remains the same)
                 $product = Product::findOrFail($item['id']);
                 if ($product->quantity_available < $item['quantity']) {
                     throw ValidationException::withMessages(['products' => "Insufficient stock for {$product->name}"]);
                 }
-                $subtotal = $product->price * $item['quantity'];
-                $tax = ($subtotal * $product->tax_rate) / 100;
-                $totalAmount += $subtotal + $tax;
+                $subtotal    = $product->price * $item['quantity'];
+                $tax         = ($subtotal * $product->tax_rate) / 100;
+                $grossTotal += $subtotal + $tax;
                 $orderItems[] = [
                     'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $product->price,
-                    'tax' => $tax,
-                    'subtotal' => $subtotal + $tax
+                    'quantity'   => $item['quantity'],
+                    'price'      => $product->price,
+                    'tax'        => $tax,
+                    'subtotal'   => $subtotal + $tax,
+                    'discount'   => 0,
                 ];
                 $product->decrement('quantity_available', $item['quantity']);
             }
 
-            // Create the main order
+            // Apply discount
+            $discountValue  = (float) ($request->discount_value ?? 0);
+            $discountAmount = 0;
+            if ($discountValue > 0) {
+                $discountAmount = $request->discount_type === 'percent'
+                    ? round($grossTotal * $discountValue / 100, 2)
+                    : min($discountValue, $grossTotal);
+
+                // Distribute discount proportionally across items
+                foreach ($orderItems as &$oi) {
+                    $oi['discount'] = round($discountAmount * ($oi['subtotal'] / $grossTotal), 2);
+                    $oi['subtotal'] = round($oi['subtotal'] - $oi['discount'], 2);
+                }
+                unset($oi);
+            }
+
+            $totalAmount = $grossTotal - $discountAmount;
+
             $order = Order::create([
-                'user_id' => auth()->id(),
-                'customer_id' => $customerId, // <-- Assign the customer ID
-                'payment_method' => $request->payment_method,
-                'total_amount' => $totalAmount,
-                'status' => 'completed'
+                'user_id'         => auth()->id(),
+                'customer_id'     => $customerId,
+                'payment_method'  => $request->payment_method,
+                'total_amount'    => $totalAmount,
+                'discount_amount' => $discountAmount,
+                'status'          => 'completed',
             ]);
 
             $order->items()->createMany($orderItems);
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Order completed successfully',
-                'redirect_url' => route('orders.show', $order)
+                'success'      => true,
+                'message'      => 'Order completed successfully',
+                'redirect_url' => route('orders.show', $order),
             ]);
 
         } catch (ValidationException $e) {

@@ -12,14 +12,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $userRole = $user->role; // Assuming you have a role field in users table
-        
-        if ($userRole === 'admin') {
-            return $this->adminDashboard();
-        } else {
-            return $this->clerkDashboard($user->id);
-        }
+        $role = auth()->user()->role;
+
+        if ($role === 'admin')  return $this->adminDashboard();
+        if ($role === 'owner')  return $this->ownerDashboard();
+
+        return $this->clerkDashboard(auth()->user()->id);
     }
     
     private function adminDashboard()
@@ -122,6 +120,22 @@ class DashboardController extends Controller
             ];
         }
         
+        // Clerk performance table — today vs all time
+        $clerkPerformance = DB::table('orders')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->where('users.role', 'clerk')
+            ->select(
+                'users.id',
+                'users.name',
+                DB::raw('SUM(orders.total_amount) as total_revenue'),
+                DB::raw('COUNT(orders.id) as total_orders'),
+                DB::raw('SUM(CASE WHEN DATE(orders.created_at) = CURDATE() THEN orders.total_amount ELSE 0 END) as today_revenue'),
+                DB::raw('COUNT(CASE WHEN DATE(orders.created_at) = CURDATE() THEN 1 END) as today_orders')
+            )
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('today_revenue')
+            ->get();
+
         return view('dashboard.index', compact(
             'totalSales',
             'totalOrders',
@@ -133,10 +147,89 @@ class DashboardController extends Controller
             'salesByCategory',
             'topClerks',
             'topProducts',
-            'hourlyData'
+            'hourlyData',
+            'clerkPerformance'
         ));
     }
     
+    private function ownerDashboard()
+    {
+        // ── Revenue KPIs ───────────────────────────────────────
+        $allTimeRevenue   = Order::sum('total_amount');
+        $thisMonthRevenue = Order::whereMonth('created_at', now()->month)
+                                 ->whereYear('created_at', now()->year)
+                                 ->sum('total_amount');
+        $lastMonthRevenue = Order::whereMonth('created_at', now()->subMonth()->month)
+                                 ->whereYear('created_at', now()->subMonth()->year)
+                                 ->sum('total_amount');
+        $revenueChange    = $lastMonthRevenue > 0
+            ? (($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100
+            : 0;
+
+        $thisMonthOrders  = Order::whereMonth('created_at', now()->month)
+                                 ->whereYear('created_at', now()->year)
+                                 ->count();
+        $todayRevenue     = Order::whereDate('created_at', today())->sum('total_amount');
+        $activeStaffToday = Order::whereDate('created_at', today())
+                                 ->distinct('user_id')->count('user_id');
+
+        // ── Revenue trend (last 30 days) ───────────────────────
+        $revenueTrend = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $revenueTrend[] = [
+                'date'   => $date->format('M d'),
+                'amount' => (float) Order::whereDate('created_at', $date)->sum('total_amount'),
+            ];
+        }
+
+        // ── Payment method breakdown ───────────────────────────
+        $paymentBreakdown = DB::table('orders')
+            ->select(DB::raw('payment_method, COUNT(*) as count, SUM(total_amount) as revenue'))
+            ->groupBy('payment_method')
+            ->get();
+
+        // ── Staff performance (this month) ─────────────────────
+        $staffPerformance = DB::table('orders')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->where('users.role', 'clerk')
+            ->select(
+                'users.id',
+                'users.name',
+                DB::raw('SUM(orders.total_amount) as month_revenue'),
+                DB::raw('COUNT(orders.id) as month_orders'),
+                DB::raw('SUM(CASE WHEN DATE(orders.created_at) = CURDATE() THEN orders.total_amount ELSE 0 END) as today_revenue'),
+                DB::raw('COUNT(CASE WHEN DATE(orders.created_at) = CURDATE() THEN 1 END) as today_orders'),
+                DB::raw('AVG(orders.total_amount) as avg_order')
+            )
+            ->whereMonth('orders.created_at', now()->month)
+            ->whereYear('orders.created_at', now()->year)
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('month_revenue')
+            ->get();
+
+        $totalStaff = User::where('role', 'clerk')->count();
+
+        // ── Stock health ───────────────────────────────────────
+        $stockHealth = [
+            'in_stock'  => Product::where('quantity_available', '>=', 10)->count(),
+            'low_stock' => Product::whereBetween('quantity_available', [1, 9])->count(),
+            'out_stock' => Product::where('quantity_available', '<=', 0)->count(),
+            'total'     => Product::count(),
+        ];
+
+        // ── Recent orders (last 8) ─────────────────────────────
+        $recentOrders = Order::with(['user', 'customer'])
+            ->latest()->limit(8)->get();
+
+        return view('dashboard.owner', compact(
+            'allTimeRevenue', 'thisMonthRevenue', 'lastMonthRevenue', 'revenueChange',
+            'thisMonthOrders', 'todayRevenue', 'activeStaffToday', 'totalStaff',
+            'revenueTrend', 'paymentBreakdown', 'staffPerformance',
+            'stockHealth', 'recentOrders'
+        ));
+    }
+
     private function clerkDashboard($userId)
     {
         // Clerk sees only their own data

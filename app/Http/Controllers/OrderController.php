@@ -24,22 +24,32 @@ class OrderController extends Controller
     //     return view('orders.index', compact('orders'));
     // }
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        // dd('This is the index method');
-        // Start query with eager loading
-        $query = Order::with(['user', 'customer'])->latest();
+        $isManager = in_array(auth()->user()->role, ['admin', 'owner']);
+        $query     = Order::with(['user', 'customer'])->latest();
 
-        // Apply role-based filtering
-        if (auth()->user()->role === 'clerk') {
-            // Clerk can only see their own orders
+        if (!$isManager) {
             $query->where('user_id', auth()->id());
+        } else {
+            // Admin/owner filters
+            if ($request->clerk_id)  $query->where('user_id', $request->clerk_id);
+            if ($request->payment)   $query->where('payment_method', $request->payment);
+            if ($request->from)      $query->whereDate('created_at', '>=', $request->from);
+            if ($request->to)        $query->whereDate('created_at', '<=', $request->to);
         }
-        // Owner and Admin see all orders, so no filter applied
 
-        $orders = $query->paginate(10);
+        $orders = $query->paginate(20)->withQueryString();
+        $clerks = $isManager
+            ? \App\Models\User::whereIn('role', ['clerk'])->orderBy('name')->get()
+            : collect();
 
-        return view('orders.index', compact('orders'));
+        // Summary stats for admin/owner toolbar
+        $todayRevenue  = $isManager ? Order::whereDate('created_at', today())->sum('total_amount') : 0;
+        $todayOrders   = $isManager ? Order::whereDate('created_at', today())->count() : 0;
+        $weekRevenue   = $isManager ? Order::whereBetween('created_at', [now()->startOfWeek(), now()])->sum('total_amount') : 0;
+
+        return view('orders.index', compact('orders', 'clerks', 'isManager', 'todayRevenue', 'todayOrders', 'weekRevenue'));
     }
 
 

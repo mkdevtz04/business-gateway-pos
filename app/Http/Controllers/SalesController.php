@@ -19,4 +19,15 @@ class SalesController extends Controller
             ->get();
         return view('sales.index', compact('sales'));
     }
+
+    public function history(Request $request)
+    {
+        $sales = Sale::with(['product', 'user'])
+            ->when($request->from, fn($q) => $q->whereDate('sale_date', '>=', $request->from))
+            ->when($request->to,   fn($q) => $q->whereDate('sale_date', '<=', $request->to))
+            ->latest('sale_date')
+            ->get();
+
+        return view('sales.index', compact('sales'));
+    }
 }
